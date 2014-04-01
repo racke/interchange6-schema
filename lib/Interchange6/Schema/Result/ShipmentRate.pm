@@ -28,7 +28,7 @@ __PACKAGE__->table("shipment_rates");
   is_auto_increment: 1
   is_nullable: 0
 
-=head2 shipment_zones_id 
+=head2 zones_id 
 
   type: 'integer'
   is_foreign_key: 1
@@ -70,7 +70,7 @@ __PACKAGE__->add_columns(
     is_auto_increment => 1,
     is_nullable => 0,
   },
-  "shipment_zones_id",
+  "zones_id",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
   "weight",
   { data_type => "numeric", default_value => "0.0", is_nullable => 0, size => [10, 2] },
@@ -101,17 +101,17 @@ __PACKAGE__->set_primary_key("shipment_rates_id");
 
 =head1 RELATIONS
 
-=head2 ShipmentZone
+=head2 Zone
 
 Type: belongs_to
 
-Related object: L<Interchange6::Schema::Result::ShipmentZone>
+Related object: L<Interchange6::Schema::Result::Zone>
 
 =cut
 
 __PACKAGE__->belongs_to(
-  "ShipmentZone",
-  "Interchange6::Schema::Result::ShipmentZone",
+  "Zone",
+  "Interchange6::Schema::Result::Zone",
   { shipment_zones_id => "shipment_zones_id" },
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
