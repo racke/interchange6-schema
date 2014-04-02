@@ -34,6 +34,11 @@ lib/Interchange6/Schema/Result/ProductAttribute.pm
 lib/Interchange6/Schema/Result/ProductAttributeValue.pm
 lib/Interchange6/Schema/Result/Review.pm
 lib/Interchange6/Schema/Result/Role.pm
+lib/Interchange6/Schema/Result/Rule.pm
+lib/Interchange6/Schema/Result/RuleAttribute.pm
+lib/Interchange6/Schema/Result/RuleAttributeValue.pm
+lib/Interchange6/Schema/Result/RuleGroup.pm
+lib/Interchange6/Schema/Result/RuleGroupline.pm
 lib/Interchange6/Schema/Result/Session.pm
 lib/Interchange6/Schema/Result/Setting.pm
 lib/Interchange6/Schema/Result/Shipment.pm
