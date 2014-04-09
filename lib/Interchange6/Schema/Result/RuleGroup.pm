@@ -139,6 +139,36 @@ __PACKAGE__->has_many(
 
 =head1 INHERITED METHODS
 
+=head2 sqlt_deploy_hook
+
+Called during table creation to add indexes on the following columns:
+
+=over 4
+
+=item * name
+
+=item * valid_from
+
+=item * valid_to
+
+=back
+
+=cut
+
+sub sqlt_deploy_hook {
+    my ( $self, $table ) = @_;
+
+    $table->add_index( name => 'rule_groups_idx_name', fields => ['name'] );
+    $table->add_index(
+        name   => 'rule_groups_idx_valid_from',
+        fields => ['valid_from']
+    );
+    $table->add_index(
+        name   => 'rule_groups_idx_valid_to',
+        fields => ['valid_to']
+    );
+}
+
 =head2 validate
 
 Validity checks that cannot be enforced using primary key, unique or other database methods using L<Interchange6::Schema::Component::Validation>. The validity checks enforce the following rules:

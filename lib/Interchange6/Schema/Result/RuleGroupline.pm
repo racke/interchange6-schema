@@ -38,6 +38,12 @@ __PACKAGE__->table("rule_grouplines");
   is_foreign_key: 1
   is_nullable: 0
 
+=head2 priority
+
+  data_type: 'integer'
+  is_nullable: 0
+  default: 0
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -51,6 +57,8 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
   "rules_id",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
+  "priority",
+  { data_type => "integer", is_nullable => 0, default => 0 },
 );
 
 =head1 PRIMARY KEY
@@ -111,5 +119,28 @@ __PACKAGE__->has_many(
   { "foreign.rules_id" => "self.rules_id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
+
+=head1 INHERITED METHODS
+
+=head2 sqlt_deploy_hook
+
+Called during table creation to add indexes on the following columns:
+
+=over 4
+
+=item * priority
+
+=back
+
+=cut
+
+sub sqlt_deploy_hook {
+    my ( $self, $table ) = @_;
+
+    $table->add_index(
+        name => 'rule_grouplines_idx_priority',
+        fields => ['priority']
+    );
+}
 
 1;
