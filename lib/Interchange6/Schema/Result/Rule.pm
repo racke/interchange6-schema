@@ -125,6 +125,7 @@ $myrule->add_attribute({ name => 'value', priority => '2'}, '1');
   data_type: 'varchar'
   default_value: (empty string)
   is_nullable: 0
+  size: 255
 
 =head2 description
 
