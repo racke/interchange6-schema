@@ -60,23 +60,26 @@ $myrule->add_attribute({ name => 'value'}, '100');
 B<Condition> The condition which is required gives the action a critera to be met before
 the action can be made.
 
-Condition requires the following attributes (operator, type, value or if type = date either a valid_from and or valid_to date .
+Condition requires the following attributes (execution, operator, type, value or if type = date either a valid_from and or valid_to date).
 
+execution: These are Dancer::Plugin::Interchange6 keywords which designate when the condition is run. example before_product_display, before_cart_display.
 type: valid types are numeric, date, char, result
 operator: valid operator values are greater_than_equals_to, less_than_equals_to, greater_than, less_than, equals, between, like, exist
 response: The responce dictates the condition's response if the condition is met.  Valid values true:false
 
 # A condition the depends on result
+$myrule->add_attribute({ name => 'execution', priority => '1'}, 'before_cart_display');
 $myrule->add_attribute({ name => 'type', priority => '1'}, 'result');
 $myrule->add_attribute({ name => 'operator', priority => '1'}, 'exists');
 $myrule->add_attribute({ name => 'value', priority => '1'}, $priority); # this would be the priority of the result rule in this case 1
 $myrule->add_attribute({ name => 'response', priority => '1'}, true);
 
 # Numeric Condition with true value greater than or equal numeric value 50.00
-$myrule->add_attribute({ name => 'type'}, 'numeric');
-$myrule->add_attribute({ name => 'operator'}, 'greater_than_equal_to');
-$myrule->add_attribute({ name => 'value'}, 50.00);
-$myrule->add_attribute({ name => 'response'}, true);
+$myrule->add_attribute({ name => 'execution', priority => '2'}, 'before_cart_display');
+$myrule->add_attribute({ name => 'type'}, priority => '2', 'numeric');
+$myrule->add_attribute({ name => 'operator', priority => '2'}, 'greater_than_equal_to');
+$myrule->add_attribute({ name => 'value', priority => '2'}, 50.00);
+$myrule->add_attribute({ name => 'response', priority => '2'}, true);
 
 =item *
 
