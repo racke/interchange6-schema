@@ -4,6 +4,9 @@ use Test::Most;
 use Test::Roo::Role;
 
 test 'media tests' => sub {
+
+    diag Test::Media;
+
     my $self = shift;
 
     my $ret;
@@ -64,26 +67,17 @@ test 'media tests' => sub {
         );
     }
 
-    my $product = $schema->resultset('Product')->create( \%product_data );
+    my $product = $self->products->first;
+
     foreach my $media_hashref (@media) {
         my $m = $product->add_to_media(
             { %$media_hashref, media_type => { type => 'image' }, } );
     }
 
-    # create another product with 1 media
+    # another product with 1 media
 
-    my $second = $schema->resultset('Product')->create(
-        {
-            sku               => '1media',
-            name              => "test",
-            short_description => 'test',
-            description       => 'long desc',
-            price             => '10.00',
-            uri               => '1media',
-            weight            => 4,
-            canonical_sku     => undef,
-        }
-    );
+    my $second = $self->products->next;
+
     $second->add_to_media(
         { %{ $media[0] }, media_type => { type => 'image' } } );
 

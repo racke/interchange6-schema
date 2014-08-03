@@ -5,26 +5,28 @@ use Test::More;
 use Test::Roo::Role;
 
 test 'payment tests' => sub {
+
+    diag Test::Payment;
+
     my $self = shift;
 
     my $schema = $self->schema;
 
-    lives_ok(
-        sub {
-            $schema->resultset("User")->create({
-                    username => 'Some user',
-                    password => 'tryme',
-                })
-        }, "Create user"
-    );
+    my $user;
+
+    lives_ok( sub { $user = $self->users->find( { username => 'customer1' } ) },
+        "grab user from fixtures" );
 
     lives_ok(
         sub {
-            $schema->resultset("Session")->create({
-                    sessions_id => '123412341234',
+            $schema->resultset("Session")->create(
+                {
+                    sessions_id  => '123412341234',
                     session_data => '',
-                })
-        }, "Create session"
+                }
+            );
+        },
+        "Create session"
     );
 
     my %insertion = (
@@ -34,7 +36,7 @@ test 'payment tests' => sub {
         sessions_id    => '123412341234',
         amount         => '10.00',
         payment_fee    => 1.00,
-        users_id       => '1',
+        users_id       => $user->id,
     );
 
     my $payment;
@@ -47,6 +49,12 @@ test 'payment tests' => sub {
     );
 
     ok( $payment->payment_fee == 1 );
+
+    # cleanup
+    lives_ok( sub { $schema->resultset("PaymentOrder")->delete_all },
+        "delete_all from PaymentOrder" );
+    lives_ok( sub { $schema->resultset("Session")->delete_all },
+        "delete_all from Session" );
 
 };
 

@@ -1,10 +1,10 @@
 use utf8;
 
-package Interchange6::Schema::Result::OrderComment;
+package Interchange6::Schema::Result::ProductReview;
 
 =head1 NAME
 
-Interchange6::Schema::Result::OrderComment
+Interchange6::Schema::Result::ProductReview
 
 =cut
 
@@ -13,15 +13,15 @@ use warnings;
 
 use base 'DBIx::Class::Core';
 
-=head1 TABLE: C<order_comments>
+=head1 TABLE: C<product_reviews>
 
 =cut
 
-__PACKAGE__->table("order_comments");
+__PACKAGE__->table("product_reviews");
 
 =head1 DESCRIPTION
 
-Link table between Order and Message for order comments.
+Link table between Product and Message for product reviews.
 
 =cut
 
@@ -33,9 +33,10 @@ Link table between Order and Message for order comments.
   is_foreign_key: 1
   is_nullable: 0
 
-=head2 orders_id
+=head2 sku
 
-  data_type: 'integer'
+  data_type: 'varchar'
+  size: 64
   is_foreign_key: 1
   is_nullable: 0
 
@@ -44,8 +45,8 @@ Link table between Order and Message for order comments.
 __PACKAGE__->add_columns(
     "messages_id",
     { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
-    "orders_id",
-    { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
+    "sku",
+    { data_type => "varchar", size => 64, is_foreign_key => 1, is_nullable => 0 },
 );
 
 =head1 PRIMARY KEY
@@ -54,13 +55,13 @@ __PACKAGE__->add_columns(
 
 =item * L</messages_id>
 
-=item * L</orders_id>
+=item * L</sku>
 
 =back
 
 =cut
 
-__PACKAGE__->set_primary_key( "messages_id", "orders_id" );
+__PACKAGE__->set_primary_key( "messages_id", "sku" );
 
 =head1 RELATIONS
 
@@ -79,18 +80,18 @@ __PACKAGE__->belongs_to(
     { cascade_delete => 1 },
 );
 
-=head2 order
+=head2 product
 
 Type: belongs_to
 
-Related object: L<Interchange6::Schema::Result::Order>
+Related object: L<Interchange6::Schema::Result::Product>
 
 =cut
 
 __PACKAGE__->belongs_to(
-    "order",
-    "Interchange6::Schema::Result::Order",
-    "orders_id",
+    "product",
+    "Interchange6::Schema::Result::Product",
+    "sku",
     { cascade_delete => 1 },
 );
 

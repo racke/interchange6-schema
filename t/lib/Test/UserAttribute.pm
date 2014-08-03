@@ -1,27 +1,19 @@
 package Test::UserAttribute;
 
+use Test::Exception;
 use Test::More;
 use Try::Tiny;
 use Test::Roo::Role;
 
 test 'user attribute tests' => sub {
+
+    diag Test::UserAttribute;
+
     my $self = shift;
 
     my $count;
 
-    my $shop_schema = $self->schema;
-
-    my $user_rs = $shop_schema->resultset('User');
-
-    # create user
-    my $user_data = {
-        username => 'nevairbe@nitesi.de',
-        email    => 'nevairbe@nitesi.de',
-        password => 'nevairbe',
-        users_id => '20'
-    };
-
-    my $user = $user_rs->create($user_data);
+    my $user = $self->users->first;
 
     # add attribute attibute value relationship
     $user->add_attribute( 'hair_color', 'blond' );
@@ -66,6 +58,11 @@ test 'user attribute tests' => sub {
     ok( $attr->count eq '3', "Testing User Attribute count." )
       || diag "User Attribute count: " . $del->count;
 
+    # cleanup
+    lives_ok(
+        sub { $user->user_attributes->delete_all },
+        "delete_all on user->user_attributes"
+    );
 };
 
 1;

@@ -153,10 +153,6 @@ __PACKAGE__->filter_column( username => {
     filter_to_storage => sub {lc($_[1])},
 });
 
-=head1 METHODS
-
-Attribute methods are provided by the L<Interchange6::Schema::Base::Attribute> class.
-
 =head1 PRIMARY KEY
 
 =over 4
@@ -281,5 +277,61 @@ Composing rels: L</user_roles> -> role
 =cut
 
 __PACKAGE__->many_to_many("roles", "user_roles", "role");
+
+=head2 approvals
+
+Type: has_many
+
+Related object: L<Interchange6::Schema::Result::Message> FK C<approved_by>
+
+=cut
+
+__PACKAGE__->has_many(
+  "approvals",
+  "Interchange6::Schema::Result::Message",
+  { 'foreign.approved_by' => 'self.users_id' },
+);
+
+=head2 messages
+
+Type: has_many
+
+Related object: L<Interchange6::Schema::Result::Message> FK C<author>
+
+=cut
+
+__PACKAGE__->has_many(
+  "messages",
+  "Interchange6::Schema::Result::Message",
+  { 'foreign.author' => 'self.users_id' },
+);
+
+=head1 METHODS
+
+Attribute methods are provided by the L<Interchange6::Schema::Base::Attribute> class.
+
+=head2 blog_posts
+
+Returns resultset of messages that are blog posts (Message->type eq 'blog_post')
+
+=cut
+
+sub blog_posts {
+    my $self = shift;
+    return $self->messages->search({ type => 'blog_post' });
+}
+
+=head2 reviews
+
+Returns resultset of messages that are reviews (referenced by ProductReview class).
+
+=cut
+
+sub reviews {
+    my $self = shift;
+    return $self->messages->search({},
+        { join =>'product_review' }
+    );
+}
 
 1;
