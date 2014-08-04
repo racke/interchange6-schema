@@ -48,8 +48,8 @@ test 'shipment tests' => sub {
         },
     );
 
-    my $lower48 = $schema->resultset("Zone")->find( { zone => 'US lower 48' } );
-warn "L48: ", $lower48, "\n";
+    my $lower48 = $self->zones->find( { zone => 'US lower 48' } );
+
     #populate shipment methods
     $schema->resultset("ShipmentMethod")->populate(
         [
