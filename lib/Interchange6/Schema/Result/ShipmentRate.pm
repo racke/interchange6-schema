@@ -48,27 +48,6 @@ assumed.  If min_weight is set and max_weight is 0 max weight is assumed as infi
   is_foreign_key: 1
   is_nullable: 0
 
-=head2 condition_name
-
-  data_type: 'varchar'
-  default_value: (empty string)
-  is_nullable: 0
-  size: 255
-
-=head2 min_value
-
-  data_type: 'numeric'
-  default_value: 0.0
-  is_nullable: 1
-  size: [10,2]
-
-=head2 max_value
-
-  data_type: 'numeric'
-  default_value: 0.0
-  is_nullable: 1
-  size: [10,2]
-
 =head2 price
 
   data_type: 'numeric'
@@ -100,12 +79,6 @@ __PACKAGE__->add_columns(
   },
   "shipment_methods_id",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
-  "condition_name",
-  { data_type => "varchar", default_value => "", is_nullable => 0, size => 255 },
-  "min_value",
-  { data_type => "numeric", default_value => "0.0", is_nullable => 1, size => [10, 2] },
-  "max_value",
-  { data_type => "numeric", default_value => "0.0", is_nullable => 1, size => [10, 2] },
   "price",
   {
     data_type => "numeric",
@@ -146,6 +119,21 @@ __PACKAGE__->belongs_to(
   "Interchange6::Schema::Result::ShipmentMethod",
   { shipment_methods_id => "shipment_methods_id" },
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
+);
+
+=head2 shipment_conditions
+
+Type: has_many
+
+Related object: L<Interchange6::Schema::Result::ShipmentMethod>
+
+=cut
+
+__PACKAGE__->has_many(
+  "shipment_conditions",
+  "Interchange6::Schema::Result::ShipmentCondition",
+  { "foreign.shipment_rates_id" => "self.shipment_rates_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
 );
 
 1;

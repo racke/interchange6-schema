@@ -100,9 +100,6 @@ warn "L48: ", $lower48, "\n";
     $flat_rate{GROUND} = $schema->resultset("ShipmentRate")->create(
         {
             shipment_methods_id => $shipment_method->id,
-            condition_name      => 'weight',
-            min_value          => '0',
-            max_value          => '0',
             price               => '9.95',
         }
 
@@ -117,25 +114,53 @@ warn "L48: ", $lower48, "\n";
         "Testing flat rate shipping price for UPS Ground lower 48 states." )
       || diag "Flat rate shipping price. " . $price;
 
+    # shipment rates and shipment conditions
     lives_ok( sub { $flat_rate{KISSFAST_60} = $schema->resultset("ShipmentRate")->create(
                 {
                     shipment_methods_id => $kissfast_id,
-                    condition_name      => 'subtotal',
-                    min_value          => undef,
-                    max_value          => '60',
                     price               => '9.95',
                 }
             )}, "Create KISSFAST_60 shipping rate." );
 
+    lives_ok( sub { $flat_rate{KISSFAST_60}->add_to_shipment_conditions(
+                {
+                    condition_name      => 'subtotal',
+                    min_value          => undef,
+                    max_value          => 60,
+                }
+            )}, "Add shipment condition to KISSFAST_60 rate." );
+
     lives_ok( sub { $flat_rate{KISSFAST_FREE} = $schema->resultset("ShipmentRate")->create(
                 {
                     shipment_methods_id => $kissfast_id,
-                    condition_name      => 'subtotal',
-                    min_value          => '60',
-                    max_value          => undef,
-                    price               => '9.95',
+                    price               => 0,
                 }
             )}, "Create KISSFAST_FREE shipping rate." );
+
+    lives_ok( sub { $flat_rate{KISSFAST_FREE}->add_to_shipment_conditions(
+                {
+                    condition_name      => 'subtotal',
+                    min_value          => 60,
+                    max_value          => undef,
+                }
+            )}, "Add shipment condition to KISSFAST_FREE rate." );
+
+    # now determine shipment rate for various subtotal's
+    my @rate_matches = ({ subtotal => 0, rate => $flat_rate{KISSFAST_60}->id, },
+                        { subtotal => 30, rate => $flat_rate{KISSFAST_60}->id, },
+                        { subtotal => 60, rate => $flat_rate{KISSFAST_FREE}->id, },
+                        { subtotal => 1000, rate => $flat_rate{KISSFAST_FREE}->id, },
+                    );
+
+    for my $rm (@rate_matches) {
+        my $id_expected = delete $rm->{rate};
+
+        my $rate = $kiss_shipment_method->determine_rate($rm);
+
+        ok( $rate->id eq $id_expected,
+            "Determine rate test for subtotal $rm->{subtotal}." );
+
+    }
 
     my ($order, $product);
 
