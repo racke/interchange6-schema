@@ -138,4 +138,59 @@ __PACKAGE__->has_many(
   { cascade_copy => 0, cascade_delete => 0 },
 );
 
+=head1 METHODS
+
+=head2 determine_rate
+
+Determines shipping rate from a hash reference of conditions.
+Throws an error if we get more than one match.
+
+=cut
+
+sub determine_rate {
+    my ($self, $values) = @_;
+    my $ship_rates = $self->shipment_rates;
+    my @result_rates;
+
+    while (my $rate = $ship_rates->next) {
+        my $ship_conds = $rate->shipment_conditions({}, {orderby => 'min_value ASC'});
+        my $rate_ok = 0;
+
+        while (my $condition = $ship_conds->next) {
+            my $compare_value = $values->{$condition->condition_name};
+            my $min_value = $condition->min_value;
+            my $max_value = $condition->max_value;
+
+            if (defined $min_value) {
+                # check against minimum value
+                if ($compare_value < $min_value) {
+                    next;
+                }
+            }
+
+            if (defined $max_value) {
+                # check against maximum value
+                if ($compare_value >= $max_value) {
+                    next;
+                }
+            }
+
+            $rate_ok = 1;
+        }
+
+        if ($rate_ok) {
+            push @result_rates, $rate;
+        }
+    }
+
+    if (@result_rates > 1) {
+        die "Multiple rates matching conditions for method ", $self->name;
+    }
+
+    if (@result_rates) {
+        return $result_rates[0];
+    }
+}
+
+
 1;
