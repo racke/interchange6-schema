@@ -141,6 +141,9 @@ test 'order comments tests' => sub {
 
     my $schema = $self->schema;
 
+    my $rset_message = $schema->resultset('Message');
+    my $rset_order_comment = $schema->resultset('OrderComment');
+
     my ( $user, $billing_address, $shipping_address, $order, $data, $result,
         $rset );
 
@@ -189,10 +192,19 @@ test 'order comments tests' => sub {
         author  => $user->id,
     };
 
-    lives_ok( sub { $result = $order->add_to_comments($data) },
-        "Add comment to order" );
+    lives_ok( sub { $order->set_comments($data) },
+        "Add comment to order using set_comments" );
 
-    isa_ok( $result, "Interchange6::Schema::Result::Message" );
+    cmp_ok( $schema->resultset('Order')->count, "==", 1, "We have 1 order" );
+    cmp_ok( $rset_message->count, '==', 1, "1 Message row" );
+    cmp_ok( $rset_order_comment->count, '==', 1, "1 OrderComment row" );
+
+    lives_ok( sub { $order->set_comments($data) },
+        "repeat set_comments" );
+
+    cmp_ok( $schema->resultset('Order')->count, "==", 1, "We have 1 order" );
+    cmp_ok( $rset_message->count, '==', 1, "1 Message row" );
+    cmp_ok( $rset_order_comment->count, '==', 1, "1 OrderComment row" );
 
     lives_ok(
         sub {
@@ -367,15 +379,15 @@ test 'product reviews tests' => sub {
 
     lives_ok(
         sub {
-            $result = $product->add_to_reviews(
+            $result = $product->set_reviews(
                 {
                     title   => "massive bananas",
                     content => "Love them",
                     author  => $author->id
-                }
+                },
             );
         },
-        "Add review to parent product"
+        "Add review to parent product with set_reviews"
     );
 
     cmp_ok( $product->reviews->count,  '==', 1, "parent has 1 reviews" );
@@ -383,12 +395,27 @@ test 'product reviews tests' => sub {
     cmp_ok( $product->_reviews->count, '==', 1, "parent has 1 _reviews" );
     cmp_ok( $variant->_reviews->count, '==', 0, "variant has 0 _reviews" );
 
+    cmp_ok( $self->schema->resultset('Message')->count,
+        '==', 2, "2 Message rows" );
+
+    cmp_ok( $self->schema->resultset('ProductReview')->count,
+        '==', 1, "1 ProductReview row" );
+
     lives_ok(
         sub {
-            $result = $variant->add_to_reviews(
-                { title => "cool bananas", content => "yellow" } );
+            $result = $product->set_reviews(
+                {
+                    title   => "massive bananas",
+                    content => "Love them",
+                    author  => $author->id
+                },
+                {
+                    title   => "cool as ice",
+                    content => "cool blue",
+                }
+            );
         },
-        "Add review to variant product"
+        "repeat set_reviews with 2 reviews"
     );
 
     cmp_ok( $product->reviews->count,  '==', 2, "parent has 2 reviews" );
@@ -398,6 +425,25 @@ test 'product reviews tests' => sub {
 
     cmp_ok( $self->schema->resultset('Message')->count,
         '==', 3, "3 Message rows" );
+
+    cmp_ok( $self->schema->resultset('ProductReview')->count,
+        '==', 2, "2 ProductReview rows" );
+
+    lives_ok(
+        sub {
+            $result = $variant->add_to_reviews(
+                { title => "cool bananas", content => "yellow" } );
+        },
+        "Add review to variant product"
+    );
+
+    cmp_ok( $product->reviews->count,  '==', 3, "parent has 3 reviews" );
+    cmp_ok( $variant->reviews->count,  '==', 3, "variant has 3 reviews" );
+    cmp_ok( $product->_reviews->count, '==', 3, "parent has 3 _reviews" );
+    cmp_ok( $variant->_reviews->count, '==', 0, "variant has 0 _reviews" );
+
+    cmp_ok( $self->schema->resultset('Message')->count,
+        '==', 4, "4 Message rows" );
 
     lives_ok( sub { $rset = $author->reviews }, "grab reviews for author" );
 
@@ -412,7 +458,7 @@ test 'product reviews tests' => sub {
         "delete all variants of parent"
     );
 
-    cmp_ok( $product->reviews->count, '==', 2, "parent has 2 reviews" );
+    cmp_ok( $product->reviews->count, '==', 3, "parent has 3 reviews" );
 
     lives_ok( sub { $product->delete }, "delete parent" );
 
