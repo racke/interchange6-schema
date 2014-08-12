@@ -118,13 +118,13 @@ The SKU of the main product if this product is a variant of a main product, othe
 =head2 active
 
   data_type: 'boolean'
-  default_value: true
+  default_value: 1
   is_nullable: 0
 
 =head2 inventory_exempt
 
   data_type: 'boolean'
-  default_value: false
+  default_value: 0
   is_nullable: 0
 
 =head2 created
@@ -164,9 +164,9 @@ __PACKAGE__->add_columns(
   "canonical_sku",
   { data_type => "varchar", is_nullable => 1, size => 64 },
   "active",
-  { data_type => "boolean", default_value => \"true", is_nullable => 0 },
+  { data_type => "boolean", default_value => 1, is_nullable => 0 },
   "inventory_exempt",
-  { data_type => "boolean", default_value => \"false", is_nullable => 0 },
+  { data_type => "boolean", default_value => 0, is_nullable => 0 },
   "created",
   { data_type => "datetime", set_on_create => 1, is_nullable => 0 },
   "last_modified",
@@ -290,15 +290,76 @@ sub find_variant {
     return;
 };
 
-=head2 attribute_iterator
+=head2 attribute_iterator( %args )
 
-Returns nested iterator for product attributes.
+=over 4
 
-For canonical products, it shows all the attributes
-of the child products.
+=item Arguments: C<< hashref => 1 >>
 
-For a child product, it shows all the attributes
-of the siblings.
+=back
+
+Return a hashref of attributes keyed on attribute name instead of an arrayref.
+
+=over 4
+
+=item Arguments: C<< selected => $sku >>
+
+=back
+
+Set the 'selected' SKU. For a child product this is set automatically.
+
+=over 4
+
+=item Returns: An arrayref of attributes complete with their respective attribute values.
+
+=back
+
+For canonical products, it shows all the attributes of the child products.
+
+For a child product, it shows all the attributes of the siblings.
+
+Example of returned arrayref:
+
+   [
+     {
+       attribute_values => [
+         {
+           priority => 2,
+           selected => 0,
+           title => "Pink",
+           value => "pink"
+         },
+         {
+           priority => 1,
+           selected => 0,
+           title => "Yellow",
+           value => "yellow"
+         }
+       ],
+       name => "color",
+       priority => 2,
+       title => "Color"
+     },
+     {
+       attribute_values => [
+         {
+           priority => 2,
+           selected => 0,
+           title => "Small",
+           value => "small"
+         },
+         {
+           priority => 1,
+           selected => 0,
+           title => "Medium",
+           value => "medium"
+         },
+       ],
+       name => "size",
+       priority => 1,
+       title => "Size"
+     }
+   ]
 
 =cut
 

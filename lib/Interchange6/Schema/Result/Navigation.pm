@@ -132,7 +132,7 @@ This ensures each record has a unique value and also allows for proper ordering.
 =head2 active
 
   data_type: 'boolean'
-  default_value: true
+  default_value: 1
   is_nullable: 0
 
 =cut
@@ -168,12 +168,64 @@ __PACKAGE__->add_columns(
   "last_modified",
   { data_type => "datetime", set_on_create => 1, set_on_update => 1, is_nullable => 0 },
   "active",
-  { data_type => "boolean", default_value => \"true", is_nullable => 0 },
+  { data_type => "boolean", default_value => 1, is_nullable => 0 },
 );
 
 =head1 METHODS
 
 Attribute methods are provided by the L<Interchange6::Schema::Base::Attribute> class.
+
+=head1 INHERITED METHODS
+
+=head2 DBIx::Class::Tree::AdjacencyList
+
+=over 4
+
+=item *
+
+L<parent|DBIx::Class::Tree::AdjacencyList/parent>
+
+=item *
+
+L<ancestors|DBIx::Class::Tree::AdjacencyList/ancestors>
+
+=item *
+
+L<as_descendant|DBIx::Class::Tree::AdjacencyList/as_descendant>
+
+=item *
+
+L<parents|DBIx::Class::Tree::AdjacencyList/parents>
+
+=item *
+
+L<children|DBIx::Class::Tree::AdjacencyList/children>
+
+=item *
+
+L<attach_child|DBIx::Class::Tree::AdjacencyList/attach_child>
+
+=item *
+
+L<siblings|DBIx::Class::Tree::AdjacencyList/siblings>
+
+=item *
+
+L<attach_sibling|DBIx::Class::Tree::AdjacencyList/attach_sibling>
+
+=item *
+
+L<is_leaf|DBIx::Class::Tree::AdjacencyList/is_leaf>
+
+=item *
+
+L<is_root|DBIx::Class::Tree::AdjacencyList/is_root>
+
+=item *
+
+L<is_branch|DBIx::Class::Tree::AdjacencyList/is_branch>
+
+=back
 
 =head1 PRIMARY KEY
 

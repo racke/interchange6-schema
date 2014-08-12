@@ -44,7 +44,7 @@ __PACKAGE__->table("product_attributes");
 Determines whether this attribute requires his own product.
 
   data_type: 'boolean'
-  default_value: true
+  default_value: 1
   is_nullable: 0
 
 =cut
@@ -61,7 +61,7 @@ __PACKAGE__->add_columns(
   "attributes_id",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0},
   "canonical",
-  { data_type => "boolean", default_value => \"true", is_nullable => 0 },
+  { data_type => "boolean", default_value => 1, is_nullable => 0 },
 );
 
 =head1 PRIMARY KEY
@@ -93,7 +93,7 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "CASCADE" },
 );
 
-=head2 product_attribute
+=head2 attribute
 
 Type: belongs_to
 
@@ -122,15 +122,5 @@ __PACKAGE__->has_many(
   { "foreign.product_attributes_id" => "self.product_attributes_id" },
   { cascade_copy => 0, cascade_delete => 0 },
 );
-
-=head2 products
-
-Type: many_to_many
-
-Composing rels: L</product_attributes> -> product
-
-=cut
-
-__PACKAGE__->many_to_many("products", "product_attributes", "product");
 
 1;
